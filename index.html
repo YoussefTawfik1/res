@@ -60,7 +60,8 @@
         <button class="btn" id="logout1">خروج</button>
       </div>
       <div class="row" style="justify-content:space-between;margin:6px 0 12px">
-        <div>التقدّم الكلي:
+        <div title="المتوسط = مجموع نسب البنود ÷ عدد البنود">
+          التقدّم الكلي (متوسط):
           <b id="overallNum">0%</b>
           <span class="bar" aria-hidden="true"><i id="overallBar"></i></span>
         </div>
@@ -113,16 +114,16 @@ catch (e) { console.error("Firebase init failed:", e); alert("أضف إعداد�
 
 /* ===== Model ===== */
 const CATS = [
-  {name:"الكتب", factor:10,  unlimited:true},
-  {name:"التبرعات", factor:261, unlimited:true},
-  {name:"الملابس", factor:9,   unlimited:true},
-  {name:"تحقيق الأماني", factor:133, unlimited:false},
-  {name:"فرحة", factor:63,  unlimited:false},
-  {name:"إطعام", factor:350, unlimited:false},
-  {name:"مساعدة عابرة", factor:60,  unlimited:false},
-  {name:"نشر أخلاقيات", factor:1,  unlimited:false},
-  {name:"الأدوية", factor:250, unlimited:true,  fixed:true},
-  {name:"تبرع بالدم", factor:1,   unlimited:false, fixed:true}
+  {name:"الكتب",           factor:10,  unlimited:true},
+  {name:"التبرعات",        factor:261, unlimited:true},
+  {name:"الملابس",         factor:9,   unlimited:true},
+  {name:"تحقيق الأماني",   factor:133, unlimited:false},
+  {name:"فرحة",            factor:63,  unlimited:false},
+  {name:"إطعام",           factor:350, unlimited:false},
+  {name:"مساعدة عابرة",    factor:60,  unlimited:false},
+  {name:"نشر أخلاقيات",    factor:1,   unlimited:false},
+  {name:"الأدوية",         factor:250, unlimited:true,  fixed:true},
+  {name:"تبرع بالدم",      factor:1,   unlimited:false, fixed:true}
 ];
 const USERS_COL = "users";
 
@@ -152,9 +153,26 @@ const getRole = () => (roleRadios.find(x=>x.checked)?.value || 'user');
 const debounce = (fn, ms=700)=>{ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; };
 
 const targetFor = (user,i) => CATS[i].fixed ? CATS[i].factor : CATS[i].factor * (+user.count||0);
-function pctFor(user,i){ const t=targetFor(user,i), d=+user.done[i]||0; if(t<=0) return 0; let p=(d/t)*100; if(!CATS[i].unlimited) p=Math.min(p,240); return Math.round(p); }
-function overallPct(user){ const sumT=CATS.reduce((a,_,i)=>a+targetFor(user,i),0); const sumD=user.done.reduce((a,b)=>a+(+b||0),0); return sumT>0?Math.round((sumD/sumT)*100):0; }
-function refreshHeader(user){ const p=overallPct(user); overallNum.textContent=p+'%'; overallBar.style.width=Math.max(0,Math.min(100,p))+'%'; }
+function pctFor(user,i){
+  const t=targetFor(user,i), d=+user.done[i]||0;
+  if(t<=0) return 0;
+  let p=(d/t)*100;
+  if(!CATS[i].unlimited) p=Math.min(p,240); // سقف العرض للبنود غير اللامحدودة
+  return Math.round(p);
+}
+
+/* === الجديد: متوسط نسب البنود === */
+function avgPct(user){
+  const total = CATS.reduce((sum,_,i)=> sum + pctFor(user,i), 0);
+  return Math.round(total / CATS.length); // نقسم على 10 بنود
+}
+
+function refreshHeader(user){
+  const p = avgPct(user);
+  overallNum.textContent = p + '%';
+  overallBar.style.width = Math.max(0, Math.min(100, p)) + '%';
+}
+
 function renderSegmentsOnly(user){
   segmentedBar.innerHTML='';
   CATS.forEach((cat,i)=>{
@@ -211,10 +229,8 @@ async function readUserPreferDraft(username){
   }
 }
 async function writeUser(username, data){
-  // خزّن مسودة محلية أولاً
-  localStorage.setItem(draftKey(username), JSON.stringify(data));
-  // ثم ارفع على Firestore
-  await setDoc(doc(db, USERS_COL, username),
+  localStorage.setItem(draftKey(username), JSON.stringify(data)); // مسودة محلية
+  await setDoc(doc(db, USERS_COL, username), // سحابة
     { count: data.count, done: data.done, updatedAt: Date.now() },
     { merge:true });
 }
@@ -257,7 +273,6 @@ function bindUserLines(user, username){
     catch(e){ console.error(e); alert('تعذّر الحفظ. راجع Console.'); }
   };
 
-  // احفظ المسودة عند الخروج
   window.addEventListener('beforeunload', ()=>{
     try{ localStorage.setItem(draftKey(username), JSON.stringify(user)); }catch{}
   }, { once:true });
@@ -272,7 +287,7 @@ async function renderUserView(username){
   userNameTag.textContent='@'+username;
   try{
     await ensureUser(username);
-    const user = await readUserPreferDraft(username); // ← يسترجع آخر محفوظ (سحابة أو مسودة)
+    const user = await readUserPreferDraft(username);
     globalCount.value = user.count;
     refreshHeader(user); renderSegmentsOnly(user);
     bindUserLines(user, username);
@@ -287,9 +302,9 @@ let adminTimer=null;
 function renderAdminTable(rows){
   if(rows.length===0){ adminContent.innerHTML='<p class="muted">لا يوجد مستخدمون بعد.</p>'; return; }
   const catHeads=CATS.map(c=>`<th>${c.name}</th>`).join('');
-  const thead=`<thead><tr><th>المستخدم</th><th>عدد</th><th>التقدّم</th>${catHeads}<th>آخر تحديث</th></tr></thead>`;
+  const thead=`<thead><tr><th>المستخدم</th><th>عدد</th><th>التقدّم (متوسط)</th>${catHeads}<th>آخر تحديث</th></tr></thead>`;
   const tbody='<tbody>'+rows.map(({username,user})=>{
-    const op=overallPct(user);
+    const op=avgPct(user);
     const cells=CATS.map((cat,i)=>`<td title="الهدف: ${targetFor(user,i)} — النسبة: ${pctFor(user,i)}%">${+user.done[i]||0}</td>`).join('');
     const ts=new Date(user.updatedAt||Date.now()).toLocaleString('ar-EG');
     return `<tr><td>@${username}</td><td>${user.count}</td>
