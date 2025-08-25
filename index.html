@@ -5,26 +5,61 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>منصة التقدّم — دخول | مستخدم / أدمن</title>
   <style>
-    body{margin:0;background:#0b1024;color:#e5e7eb;font-family:"Tajawal",sans-serif;min-height:100dvh;display:flex;justify-content:center;align-items:center;padding:20px}
-    .wrap{width:min(1200px,100%)}
-    .card{background:#111827cc;border:1px solid #3b445a;border-radius:16px;padding:16px;margin-top:14px}
+    :root{
+      --bg:#0b1024;
+      --card:#111827cc;
+      --stroke:#3b445a;
+      --fg:#e5e7eb;
+      --muted:#9aa4b2;
+      --btn:#0f1b47;
+      --seg-bg:#222;
+      --seg-fill:#16c7f0; /* سماوي مريح */
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;background:var(--bg);color:var(--fg);font-family:"Tajawal",system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial,sans-serif;
+      min-height:100dvh;display:flex;justify-content:center;align-items:center;padding:20px
+    }
+    .wrap{width:min(1100px,100%);margin-inline:auto}
+    .card{background:var(--card);border:1px solid var(--stroke);border-radius:16px;padding:16px;margin-top:14px}
     h1,h2,h3{margin:0 0 10px}
-    .row{display:flex;gap:12px;align-items:center}
-    .btn{background:#0f1b47;border:1px solid #3b445a;color:#e5e7eb;padding:10px 14px;border-radius:10px;cursor:pointer}
+    .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    .btn{
+      background:var(--btn);border:1px solid var(--stroke);color:var(--fg);
+      padding:10px 14px;border-radius:10px;cursor:pointer
+    }
     .btn:hover{filter:brightness(1.1)}
-    input[type=text],input[type=password],input[type=number]{background:#081136;border:1px solid #3b445a;color:#e5e7eb;padding:8px 10px;border-radius:10px}
-    .muted{color:#9aa4b2}
-    .segmented{display:grid;grid-template-columns:repeat(10,1fr);gap:8px}
-    .segwrap{display:flex;flex-direction:column;gap:4px;align-items:stretch}
+    input[type=text],input[type=password],input[type=number]{
+      background:#081136;border:1px solid var(--stroke);color:var(--fg);
+      padding:10px;border-radius:10px;min-width:180px
+    }
+    label{display:flex;gap:8px;align-items:center}
+    .muted{color:var(--muted)}
+    .segmented{
+      display:grid;gap:10px;
+      grid-template-columns: repeat(auto-fill, minmax(140px,1fr));
+    }
+    .segwrap{display:flex;flex-direction:column;gap:6px;align-items:stretch}
     .cap{text-align:center;font-size:12px;color:#bbb}
-    .segment{position:relative;height:30px;border-radius:6px;background:#222}
-    .fill{position:absolute;top:0;left:0;bottom:0;width:0%;background:cyan}
-    .pct{position:absolute;inset:0;display:grid;place-items:center;font-size:12px;color:#fff}
-    .grid{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}
+    .segment{position:relative;height:34px;border-radius:8px;background:var(--seg-bg);overflow:hidden}
+    .fill{position:absolute;top:0;left:0;bottom:0;width:0%;background:var(--seg-fill)}
+    .pct{position:absolute;inset:0;display:grid;place-items:center;font-size:12px;color:#fff;text-shadow:0 1px 2px #0008}
+    .grid{
+      display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center
+    }
     .head{color:#aaa;font-size:14px}
     .rowc{display:contents}
-    table{width:100%;border-collapse:collapse;min-width:980px}
-    th,td{border-bottom:1px solid #3b445a;padding:6px 8px;text-align:center}
+    .tablewrap{width:100%;overflow-x:auto}
+    table{width:100%;border-collapse:collapse;min-width:900px}
+    th,td{border-bottom:1px solid var(--stroke);padding:8px;text-align:center;white-space:nowrap}
+    .bar{
+      inline-size: 220px; block-size: 10px; background:#1f2842; border-radius:999px; overflow:hidden; display:inline-block; vertical-align:middle
+    }
+    .bar > i{display:block; block-size:100%; inline-size:0%; background:var(--seg-fill)}
+    @media (max-width: 640px){
+      input[type=text],input[type=password],input[type=number]{min-width:unset;width:100%}
+      .grid{grid-template-columns:1fr}
+    }
   </style>
 </head>
 <body>
@@ -37,9 +72,9 @@
         <label><input type="radio" name="role" value="user" checked> مستخدم</label>
         <label><input type="radio" name="role" value="admin"> أدمن</label>
       </div>
-      <div class="row" style="margin-top:8px">
-        <label>الاسم: <input id="loginName" type="text"></label>
-        <label id="adminCodeWrap" style="display:none">كود الأدمن: <input id="adminCode" type="password"></label>
+      <div class="row" style="margin-top:8px; width:100%">
+        <label style="flex:1 1 220px">الاسم: <input id="loginName" type="text" placeholder="مثال: ali123"></label>
+        <label id="adminCodeWrap" style="display:none; flex:1 1 220px">كود الأدمن: <input id="adminCode" type="password" placeholder="•••••••"></label>
       </div>
       <div class="row" style="margin-top:12px">
         <button class="btn" id="loginBtn">دخول</button>
@@ -52,11 +87,22 @@
         <h2>لوحة المستخدم <span id="userNameTag"></span></h2>
         <button class="btn" id="logout1">خروج</button>
       </div>
+
       <div class="row" style="justify-content:space-between;margin:6px 0 12px">
-        <div>التقدّم الكلي: <b id="overallNum">0%</b></div>
-        <div><label>عدد: <input id="globalCount" type="number" min="0" value="0"></label></div>
+        <div>التقدّم الكلي:
+          <b id="overallNum">0%</b>
+          <span class="bar" aria-hidden="true"><i id="overallBar"></i></span>
+        </div>
+        <div class="row" style="gap:8px">
+          <label>عدد:
+            <input id="globalCount" type="number" min="0" value="0">
+          </label>
+          <button class="btn" id="saveAllBtn" title="حفظ التغييرات يدويًا">حفظ</button>
+        </div>
       </div>
+
       <div class="segmented" id="segmentedBar"></div>
+
       <div class="card" style="margin-top:14px">
         <div class="grid" id="grid">
           <div class="head">البند</div>
@@ -75,158 +121,308 @@
     </section>
   </div>
 
-<script>
-(function(){
-  // ================= CONFIG =================
-  const ADMIN_CODE = "admin123"; // غيّره كما تشاء
+<!-- Firebase نسخة CDN + منطق التطبيق -->
+<script type="module">
+/* ================= CONFIG ================= */
+const ADMIN_CODE = "admin123"; // غيّره كما تشاء
 
-  // ================= DATA MODEL =================
-  const CATS=[
-    {name:"الكتب", factor:10,  unlimited:true},
-    {name:"التبرعات", factor:261, unlimited:true},
-    {name:"الملابس", factor:9,   unlimited:true},
-    {name:"تحقيق الأماني", factor:133, unlimited:false},
-    {name:"فرحة", factor:63,  unlimited:false},
-    {name:"إطعام", factor:350, unlimited:false},
-    {name:"مساعدة عابرة", factor:60,  unlimited:false},
-    {name:"نشر أخلاقيات", factor:1,  unlimited:false},
-    {name:"الأدوية", factor:250, unlimited:true,  fixed:true},
-    {name:"تبرع بالدم", factor:1,   unlimited:false, fixed:true}
-  ];
+// 🔧 ضع إعدادات مشروعك من Firebase console هنا:
+const firebaseConfig = {
+  apiKey: "AIzaSyAzO-Jlh5CMWqANKTij9U1jayaq7Qfp_lw",
+  authDomain: "res4-fb3e7.firebaseapp.com",
+  projectId: "res4-fb3e7",
+  storageBucket: "res4-fb3e7.firebasestorage.app",
+  messagingSenderId: "722972146284",
+  appId: "1:722972146284:web:60e622b1d7500697c1b649",
+  measurementId: "G-11522XE4VN"
+};
 
-  // ================= STORAGE =================
-  const S_USERS   = 'progress10:users';     // { username: { count, done[], updatedAt } }
-  const S_SESSION = 'progress10:session';   // { role, username }
-  const nowIso = ()=> new Date().toISOString();
-  function getUsers(){ try{ return JSON.parse(localStorage.getItem(S_USERS)||'{}'); } catch(e){ return {}; } }
-  function saveUsers(map){ localStorage.setItem(S_USERS, JSON.stringify(map)); }
-  function ensureUser(username){ const m=getUsers(); if(!m[username]){ m[username]={count:0, done:Array(CATS.length).fill(0), updatedAt:nowIso()}; saveUsers(m);} return readUser(username); }
-  function readUser(username){ const m=getUsers(); return m[username] ? {...m[username]} : {count:0, done:Array(CATS.length).fill(0), updatedAt:nowIso()}; }
-  function writeUser(username, data){ const m=getUsers(); m[username] = {...data, updatedAt:nowIso()}; saveUsers(m); }
+/* ============== Firebase Init ============== */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getFirestore, doc, getDoc, setDoc, onSnapshot, collection, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-  // ================= EL REFS =================
-  const viewLogin = document.getElementById('view-login');
-  const viewUser  = document.getElementById('view-user');
-  const viewAdmin = document.getElementById('view-admin');
+let app, db;
+try {
+  app = initializeApp(firebaseConfig);
+  db  = getFirestore(app);
+} catch (e) {
+  console.error("Firebase init failed. تأكّد من firebaseConfig:", e);
+  alert("تنبيه: لم يتم تهيئة Firebase. رجاءً أضف إعدادات firebaseConfig ثم أعد التحميل.");
+}
 
-  const loginName = document.getElementById('loginName');
-  const adminCodeEl   = document.getElementById('adminCode');
-  const adminCodeWrap = document.getElementById('adminCodeWrap');
-  const loginBtn = document.getElementById('loginBtn');
-  const roleRadios = Array.from(document.querySelectorAll('input[name=role]'));
+/* ============== DATA MODEL ============== */
+const CATS = [
+  {name:"الكتب", factor:10,  unlimited:true},
+  {name:"التبرعات", factor:261, unlimited:true},
+  {name:"الملابس", factor:9,   unlimited:true},
+  {name:"تحقيق الأماني", factor:133, unlimited:false},
+  {name:"فرحة", factor:63,  unlimited:false},
+  {name:"إطعام", factor:350, unlimited:false},
+  {name:"مساعدة عابرة", factor:60,  unlimited:false},
+  {name:"نشر أخلاقيات", factor:1,  unlimited:false},
+  {name:"الأدوية", factor:250, unlimited:true,  fixed:true},
+  {name:"تبرع بالدم", factor:1,   unlimited:false, fixed:true}
+];
 
-  const userNameTag = document.getElementById('userNameTag');
-  const overallNum  = document.getElementById('overallNum');
-  const globalCount = document.getElementById('globalCount');
-  const segmentedBar= document.getElementById('segmentedBar');
-  const grid        = document.getElementById('grid');
-  const adminContent= document.getElementById('adminContent');
+// Firestore collection reference name
+const USERS_COL = "users";
 
-  // ================= HELPERS =================
-  function show(view){ viewLogin.style.display='none'; viewUser.style.display='none'; viewAdmin.style.display='none'; view.style.display='block'; }
-  function getRole(){ const r = roleRadios.find(x=>x.checked); return r ? r.value : 'user'; }
+/* ============== EL REFS ============== */
+const viewLogin = document.getElementById('view-login');
+const viewUser  = document.getElementById('view-user');
+const viewAdmin = document.getElementById('view-admin');
 
-  function targetFor(user,i){ const cat=CATS[i]; return cat.fixed ? cat.factor : cat.factor * (+user.count||0); }
-  function pctFor(user,i){ const t=targetFor(user,i), d=+user.done[i]||0; if(t<=0) return 0; let p=(d/t)*100; if(!CATS[i].unlimited) p=Math.min(p,240); return Math.round(p); }
-  function overallPct(user){ const sumT=CATS.reduce((a,_,i)=>a+targetFor(user,i),0); const sumD=user.done.reduce((a,b)=>a+(+b||0),0); return sumT>0?Math.round((sumD/sumT)*100):0; }
+const loginName = document.getElementById('loginName');
+const adminCodeEl   = document.getElementById('adminCode');
+const adminCodeWrap = document.getElementById('adminCodeWrap');
+const loginBtn = document.getElementById('loginBtn');
+const roleRadios = Array.from(document.querySelectorAll('input[name=role]'));
 
-  function refreshHeader(user){ overallNum.textContent = overallPct(user) + '%'; }
-  function renderSegmentsOnly(user){
-    segmentedBar.innerHTML='';
-    CATS.forEach((cat,i)=>{
-      const wrap=document.createElement('div'); wrap.className='segwrap';
-      const cap=document.createElement('div'); cap.className='cap'; cap.textContent=cat.name;
-      const seg=document.createElement('div'); seg.className='segment';
-      const v=pctFor(user,i);
-      const fill=document.createElement('div'); fill.className='fill'; fill.style.width=Math.max(0,Math.min(100,v))+'%';
-      const pctEl=document.createElement('div'); pctEl.className='pct'; pctEl.textContent=v+'%';
-      seg.appendChild(fill); seg.appendChild(pctEl); wrap.appendChild(cap); wrap.appendChild(seg);
-      seg.title = `${cat.name} — أنجزت ${user.done[i]} من هدف ${targetFor(user,i)}`;
-      segmentedBar.appendChild(wrap);
+const userNameTag = document.getElementById('userNameTag');
+const overallNum  = document.getElementById('overallNum');
+const overallBar  = document.getElementById('overallBar');
+const globalCount = document.getElementById('globalCount');
+const segmentedBar= document.getElementById('segmentedBar');
+const grid        = document.getElementById('grid');
+const saveAllBtn  = document.getElementById('saveAllBtn');
+const adminContent= document.getElementById('adminContent');
+
+/* ============== HELPERS ============== */
+const S_SESSION = 'progress10:session'; // { role, username }
+
+function show(view){
+  viewLogin.style.display='none';
+  viewUser.style.display='none';
+  viewAdmin.style.display='none';
+  view.style.display='block';
+}
+function getRole(){ const r = roleRadios.find(x=>x.checked); return r ? r.value : 'user'; }
+
+function targetFor(user,i){
+  const cat=CATS[i];
+  return cat.fixed ? cat.factor : cat.factor * (+user.count||0);
+}
+function pctFor(user,i){
+  const t=targetFor(user,i), d=+user.done[i]||0;
+  if(t<=0) return 0;
+  let p=(d/t)*100;
+  if(!CATS[i].unlimited) p=Math.min(p,240);
+  return Math.round(p);
+}
+function overallPct(user){
+  const sumT=CATS.reduce((a,_,i)=>a+targetFor(user,i),0);
+  const sumD=user.done.reduce((a,b)=>a+(+b||0),0);
+  return sumT>0?Math.round((sumD/sumT)*100):0;
+}
+
+function refreshHeader(user){
+  const p = overallPct(user);
+  overallNum.textContent = p + '%';
+  overallBar.style.width = Math.max(0, Math.min(100, p)) + '%';
+}
+function renderSegmentsOnly(user){
+  segmentedBar.innerHTML='';
+  CATS.forEach((cat,i)=>{
+    const wrap=document.createElement('div'); wrap.className='segwrap';
+    const cap=document.createElement('div'); cap.className='cap'; cap.textContent=cat.name;
+    const seg=document.createElement('div'); seg.className='segment';
+    const v=pctFor(user,i);
+    const fill=document.createElement('div'); fill.className='fill'; fill.style.width=Math.max(0,Math.min(100,v))+'%';
+    const pctEl=document.createElement('div'); pctEl.className='pct'; pctEl.textContent=v+'%';
+    seg.appendChild(fill); seg.appendChild(pctEl); wrap.appendChild(cap); wrap.appendChild(seg);
+    seg.title = `${cat.name} — أنجزت ${user.done[i]} من هدف ${targetFor(user,i)}`;
+    segmentedBar.appendChild(wrap);
+  });
+}
+
+/* ============== FIRESTORE I/O ============== */
+function emptyUser(){
+  return { count:0, done:Array(CATS.length).fill(0), updatedAt: new Date() };
+}
+async function ensureUser(username){
+  const ref = doc(db, USERS_COL, username);
+  const snap = await getDoc(ref);
+  if(!snap.exists()){
+    await setDoc(ref, { ...emptyUser(), updatedAt: serverTimestamp() });
+    return emptyUser();
+  }
+  return normalizeUser(snap.data());
+}
+function normalizeUser(data){
+  const safe = emptyUser();
+  safe.count = Number(data?.count || 0);
+  // تأمين طول المصفوفة يساوي عدد التصنيفات
+  const raw = Array.isArray(data?.done) ? data.done : [];
+  safe.done = CATS.map((_,i)=> Number(raw[i] || 0));
+  safe.updatedAt = data?.updatedAt || new Date();
+  return safe;
+}
+async function readUser(username){
+  const ref = doc(db, USERS_COL, username);
+  const snap = await getDoc(ref);
+  if(!snap.exists()) return emptyUser();
+  return normalizeUser(snap.data());
+}
+async function writeUser(username, data){
+  const ref = doc(db, USERS_COL, username);
+  await setDoc(ref, { count: data.count, done: data.done, updatedAt: serverTimestamp() }, { merge:true });
+}
+
+/* ============== USER VIEW ============== */
+function bindUserGrid(user, username){
+  // امسح السطور القديمة
+  Array.from(grid.querySelectorAll('.rowc')).forEach(x=>x.remove());
+
+  CATS.forEach((cat,i)=>{
+    const r1=document.createElement('div'); r1.className='rowc'; r1.textContent=`${i+1}. ${cat.name}`;
+    const r2=document.createElement('div'); r2.className='rowc';
+    const inp=document.createElement('input'); inp.type='number'; inp.min='0'; inp.step='any'; inp.value=user.done[i];
+    inp.style.width = '160px';
+    r2.appendChild(inp);
+    grid.appendChild(r1); grid.appendChild(r2);
+
+    inp.addEventListener('input', ()=>{
+      let v=+inp.value||0;
+      if(!cat.unlimited){
+        const cap=targetFor(user,i)*2.4;
+        if(v>cap) v=cap;
+      }
+      user.done[i]=v; inp.value=v;
+      refreshHeader(user);
+      renderSegmentsOnly(user);
     });
-  }
-
-  // ================= USER VIEW =================
-  function renderUser(user, username){
-    userNameTag.textContent = '@'+username;
-    refreshHeader(user);
-    globalCount.value = user.count;
-    renderSegmentsOnly(user);
-
-    // Build inputs once
-    Array.from(grid.querySelectorAll('.rowc')).forEach(x=>x.remove());
-    CATS.forEach((cat,i)=>{
-      const r1=document.createElement('div'); r1.className='rowc'; r1.textContent=`${i+1}. ${cat.name}`;
-      const r2=document.createElement('div'); r2.className='rowc';
-      const inp=document.createElement('input'); inp.type='number'; inp.min='0'; inp.step='any'; inp.value=user.done[i]; r2.appendChild(inp);
-      grid.appendChild(r1); grid.appendChild(r2);
-      inp.addEventListener('input',()=>{
-        let v=+inp.value||0; if(!cat.unlimited){ const cap=targetFor(user,i)*2.4; if(v>cap) v=cap; }
-        user.done[i]=v; inp.value=v; writeUser(username,user); renderSegmentsOnly(user); refreshHeader(user);
-      });
-    });
-
-    // Count change
-    globalCount.oninput = ()=>{ user.count = +globalCount.value||0; writeUser(username,user); renderSegmentsOnly(user); refreshHeader(user); };
-
-    // Logout
-    const logout1 = document.getElementById('logout1');
-    if(logout1) logout1.onclick = ()=>{ localStorage.removeItem(S_SESSION); show(viewLogin); };
-  }
-
-  // ================= ADMIN VIEW =================
-  function renderAdmin(){
-    const users = getUsers();
-    const names = Object.keys(users).sort();
-    if(names.length===0){ adminContent.innerHTML = '<p class="muted">لا يوجد مستخدمون بعد.</p>'; return; }
-
-    const catHeads = CATS.map(c=>`<th>${c.name}</th>`).join('');
-    const thead = `<thead><tr><th>المستخدم</th><th>عدد</th><th>التقدّم الكلي</th>${catHeads}<th>آخر تحديث</th></tr></thead>`;
-
-    const tbody = '<tbody>' + names.map(u=>{
-      const user = users[u];
-      const op = overallPct(user);
-      const cells = CATS.map((cat,i)=>{
-        const d = +user.done[i]||0; const t = targetFor(user,i); const p = pctFor(user,i);
-        return `<td title="الهدف: ${t} — النسبة: ${p}%">${d}</td>`;
-      }).join('');
-      const ts = new Date(user.updatedAt).toLocaleString('ar-EG');
-      return `<tr><td>@${u}</td><td>${user.count}</td><td>${op}%</td>${cells}<td class="muted">${ts}</td></tr>`;
-    }).join('') + '</tbody>';
-
-    adminContent.innerHTML = `<div class="tablewrap"><table>${thead}${tbody}</table></div>`;
-
-    const logout2 = document.getElementById('logout2');
-    if(logout2) logout2.onclick = ()=>{ localStorage.removeItem(S_SESSION); show(viewLogin); };
-  }
-
-  // ================= LOGIN LOGIC =================
-  roleRadios.forEach(r=> r.addEventListener('change', ()=>{ adminCodeWrap.style.display = (getRole()==='admin') ? '' : 'none'; }));
-
-  loginBtn.addEventListener('click', ()=>{
-    const role = getRole();
-    if(role==='admin'){
-      if((adminCodeEl.value||'') !== ADMIN_CODE){ alert('كود الأدمن غير صحيح'); return; }
-      localStorage.setItem(S_SESSION, JSON.stringify({role:'admin'}));
-      show(viewAdmin); renderAdmin();
-      return;
-    }
-    // user
-    const name = (loginName.value||'').trim();
-    if(!name){ alert('من فضلك أدخل اسم المستخدم'); return; }
-    ensureUser(name);
-    localStorage.setItem(S_SESSION, JSON.stringify({role:'user', username:name}));
-    show(viewUser); renderUser(readUser(name), name);
   });
 
-  // ================= BOOT =================
+  globalCount.oninput = ()=>{
+    user.count = +globalCount.value||0;
+    refreshHeader(user);
+    renderSegmentsOnly(user);
+  };
+
+  saveAllBtn.onclick = async ()=>{
+    try{
+      await writeUser(username, user);
+      alert('تم الحفظ ✅');
+    }catch(e){
+      console.error(e);
+      alert('تعذّر الحفظ. راجع Console.');
+    }
+  };
+
+  const logout1 = document.getElementById('logout1');
+  logout1.onclick = ()=>{ localStorage.removeItem(S_SESSION); show(viewLogin); };
+}
+
+async function renderUserView(username){
+  userNameTag.textContent = '@'+username;
   try{
-    const sess = JSON.parse(localStorage.getItem(S_SESSION)||'null');
-    if(sess && sess.role==='admin'){ show(viewAdmin); renderAdmin(); }
-    else if(sess && sess.role==='user' && sess.username){ show(viewUser); renderUser(readUser(sess.username), sess.username); }
-    else { show(viewLogin); }
-  }catch(e){ show(viewLogin); }
-})();
+    // تأكد من وجود المستخدم ثم اقرأ آخر نسخة
+    await ensureUser(username);
+    const user = await readUser(username);
+    globalCount.value = user.count;
+    refreshHeader(user);
+    renderSegmentsOnly(user);
+    bindUserGrid(user, username);
+  }catch(e){
+    console.error(e);
+    alert('تعذّر تحميل بيانات المستخدم. تأكد من Firestore.');
+  }
+}
+
+/* ============== ADMIN VIEW (LIVE) ============== */
+let unsubscribeAdmin = null;
+function renderAdminTable(rows){
+  if(rows.length===0){
+    adminContent.innerHTML = '<p class="muted">لا يوجد مستخدمون بعد.</p>'; return;
+  }
+  const catHeads = CATS.map(c=>`<th>${c.name}</th>`).join('');
+  const thead = `<thead><tr><th>المستخدم</th><th>عدد</th><th>التقدّم</th>${catHeads}<th>آخر تحديث</th></tr></thead>`;
+
+  const tbody = '<tbody>' + rows.map(({username,user})=>{
+    const op = overallPct(user);
+    const cells = CATS.map((cat,i)=>{
+      const d = +user.done[i]||0; const t = targetFor(user,i); const p = pctFor(user,i);
+      return `<td title="الهدف: ${t} — النسبة: ${p}%">${d}</td>`;
+    }).join('');
+    // طابع زمني
+    let ts = '';
+    try{
+      if(user.updatedAt?.toDate) ts = user.updatedAt.toDate().toLocaleString('ar-EG');
+      else ts = new Date(user.updatedAt || Date.now()).toLocaleString('ar-EG');
+    }catch{ ts = ''; }
+
+    return `<tr>
+      <td>@${username}</td>
+      <td>${user.count}</td>
+      <td>
+        ${op}% &nbsp;
+        <span class="bar" aria-hidden="true"><i style="width:${Math.max(0,Math.min(100,op))}%"></i></span>
+      </td>
+      ${cells}
+      <td class="muted">${ts}</td>
+    </tr>`;
+  }).join('') + '</tbody>';
+
+  adminContent.innerHTML = `<div class="tablewrap"><table>${thead}${tbody}</table></div>`;
+}
+
+function startAdminLive(){
+  const logout2 = document.getElementById('logout2');
+  logout2.onclick = ()=>{
+    localStorage.removeItem(S_SESSION);
+    if(unsubscribeAdmin) unsubscribeAdmin();
+    show(viewLogin);
+  };
+
+  if(!db){
+    adminContent.innerHTML = `<p class="muted">لم يتم تهيئة Firebase. أضف إعدادات firebaseConfig.</p>`;
+    return;
+  }
+
+  if(unsubscribeAdmin) unsubscribeAdmin(); // في حال التنقّل
+  unsubscribeAdmin = onSnapshot(collection(db, USERS_COL), (snap)=>{
+    const rows = [];
+    snap.forEach(docSnap=>{
+      rows.push({ username: docSnap.id, user: normalizeUser(docSnap.data()) });
+    });
+    // ترتيب أبجدي
+    rows.sort((a,b)=> a.username.localeCompare(b.username,'ar'));
+    renderAdminTable(rows);
+  }, (err)=>{
+    console.error("Admin snapshot error:", err);
+    adminContent.innerHTML = `<p class="muted">تعذّر تحميل البيانات (راجع Console).</p>`;
+  });
+}
+
+/* ============== LOGIN LOGIC ============== */
+roleRadios.forEach(r=> r.addEventListener('change', ()=>{
+  adminCodeWrap.style.display = (getRole()==='admin') ? '' : 'none';
+}));
+
+loginBtn.addEventListener('click', async ()=>{
+  const role = getRole();
+  if(role==='admin'){
+    if((adminCodeEl.value||'') !== ADMIN_CODE){ alert('كود الأدمن غير صحيح'); return; }
+    localStorage.setItem(S_SESSION, JSON.stringify({role:'admin'}));
+    show(viewAdmin); startAdminLive();
+    return;
+  }
+  // user
+  const name = (loginName.value||'').trim();
+  if(!name){ alert('من فضلك أدخل اسم المستخدم'); return; }
+  localStorage.setItem(S_SESSION, JSON.stringify({role:'user', username:name}));
+  show(viewUser); renderUserView(name);
+});
+
+/* ============== BOOT ============== */
+try{
+  const sess = JSON.parse(localStorage.getItem(S_SESSION)||'null');
+  if(sess && sess.role==='admin'){ show(viewAdmin); startAdminLive(); }
+  else if(sess && sess.role==='user' && sess.username){ show(viewUser); renderUserView(sess.username); }
+  else { show(viewLogin); }
+}catch(e){ show(viewLogin); }
 </script>
 </body>
 </html>
